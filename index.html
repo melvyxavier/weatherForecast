@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body
+    style="background-image: url(./image/sun\ Rays\,\ Morning\,\ Forest\,\ Path\,\ Mist\,\ Trees\,\ Grass\,\ Nature\,\ Landscape.jpg);">
+
+    <div class="parent" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 55%;">
+        <div class="text-center" style="background-color: rgba(96, 89, 43, 0.758);"><br>
+
+            <h1 class="mt-4 fs-25px" style="text-align: center;font-family: 'Libre Baskerville', serif;color: white;">
+                Weather Forecast</h1>
+
+            <form class="p-3" ; action="">
+
+                <div class="p-2">
+                    <input id="g1" type="text" style="font-family: 'Libre Baskerville', serif;"
+                        placeholder="Enter Location" class="form-control text-center">
+
+                    <div class="mt-2 p-2">
+                        <button onclick="getWeatherByCurrentLocation()" style="font-family: 'Libre Baskerville', serif;"
+                            type="button" class="btn btn-outline-light text-white">Use Current Location</button>
+                    </div>
+
+                    <div class="mt-2 p-2">
+                        <button onclick="weatherForecast()" style="font-family: 'Libre Baskerville', serif;"
+                            type="button" class="btn btn-success">Search Weather</button>
+                    </div>
+                </div>
+
+                <br>
+
+
+                <div id="result" style="border: 1px double;border-color:rgba(1, 37, 12, 0.758) ;">
+
+                    <div style="text-align: start;"></div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+
+<script>
+
+    //weather forecast function
+
+    function weatherForecast() {
+
+        const location = document.getElementById('g1').value;
+        const apiKey = 'b41ec3be35c7dac8aabbc21ba253137a';
+
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(cData => displayData(cData))
+            .catch(error => {
+                console.error('Error fetching weather data:', error);
+                result.innerHTML = '<h6 class="text-light">Error fetching weather data. Please try again.</h6>';
+            });
+
+        function displayData(dataArray) {
+            const name = dataArray.name;
+            const weather = dataArray.weather[0].description;
+            const temp1 = dataArray.main.temp;
+            const temperature = Math.floor(temp1 - 273.15);
+            const humidity = dataArray.main.humidity + "%";
+            const windspeed = dataArray.wind.speed
+
+            result.innerHTML = `
+            
+            
+    <h3 class="text-light" style="text-align:center;font-family: 'Libre Baskerville', serif;"><i class="fa-solid fa-location-dot fa-2xs"></i> ${name}</h3>
+    <h6 class="text-light" style="text-align:center; font-family: 'Libre Baskerville', serif;"><i class="fa-solid fa-temperature-three-quarters"></i> ${temperature}°C</h6>
+
+    <h6 class="text-light" style="text-align:center; font-family: 'Libre Baskerville', serif;"> ${weather}</h6>
+    <h6 class="text-light" style="text-align:center;font-family: 'Libre Baskerville', serif;"> <i class="fa-solid fa-wind"></i>${windspeed}</h6>
+<h6 class="text-light" style="text-align:center;font-family: 'Libre Baskerville', serif;">Humidity: ${humidity}</h6>
+  `
+        }
+
+    }
+
+    //use curent location function
+
+    function getWeatherByCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const apiKey = 'b41ec3be35c7dac8aabbc21ba253137a';
+
+            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(cData => displayData(cData))
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    result.innerHTML = '<h6 class="text-light">Error fetching weather data. Please try again.</h6>';
+                });
+        }, (error) => {
+            console.error('Error getting geolocation:', error);
+            result.innerHTML = '<h6 class="text-light">Error getting geolocation. Please try again or use the search option.</h6>';
+        });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        result.innerHTML = '<h6 class="text-light">Geolocation is not supported by this browser. Please use the search option.</h6>';
+    }
+}
+
+</script>
+
+</html>
